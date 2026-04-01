@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Admin Dashboard | ET Receptionist</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f9fafb;
+            color: #1f2937;
+            overflow-x: hidden;
+        }
+        
+        /* Login Page Styles */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 2000;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 32px;
+            padding: 48px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: slideUp 0.5s ease;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .login-header i {
+            font-size: 56px;
+            color: #4361ee;
+            margin-bottom: 16px;
+        }
+        
+        .login-header h1 {
+            font-size: 28px;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        
+        .login-header p {
+            color: #64748b;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #4361ee;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(67, 97, 238, 0.3);
+        }
+        
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+            text-align: center;
+        }
+        
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        /* Dashboard Container */
+        .dashboard-container {
+            display: none;
+        }
+        
+        .dashboard-container.active {
+            display: block;
+        }
+        
+        /* ========== DASHBOARD STYLES ========== */
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --primary-light: #eef2ff;
+            --secondary: #f97316;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --gray-light: #f1f5f9;
+            --white: #ffffff;
+            --sidebar-width: 280px;
+        }
+        
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--white);
+            border-right: 1px solid #e2e8f0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        
+        .logo {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .logo i {
+            font-size: 28px;
+            color: var(--primary);
+        }
+        
+        .logo span {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        
+        .nav-menu {
+            padding: 20px 16px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            margin: 4px 0;
+            border-radius: 12px;
+            color: var(--gray);
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .nav-item:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+        
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .nav-item i {
+            width: 20px;
+        }
+        
+        .nav-item .badge {
+            margin-left: auto;
+            background: var(--danger);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+        
+        .status-card {
+            margin: 20px;
+            padding: 20px;
+            background: var(--gray-light);
+            border-radius: 16px;
+        }
+        
+        .status-time {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .status-date {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 4px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+        }
+        
+        .header {
+            background: var(--white);
+            padding: 20px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .header-title h1 {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .header-title p {
+            color: var(--gray);
+            margin-top: 4px;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .mic-button {
+            background: var(--gray-light);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* View */
+        .view {
+            display: none;
+            padding: 32px;
+            animation: fadeIn 0.3s;
+        }
+        
+        .view.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: var(--white);
+            padding: 24px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-light);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .stat-icon i {
+            font-size: 28px;
+            color: var(--primary);
+        }
+        
+        .stat-info h3 {
+            font-size: 32px;
+            font-weight: 700;
+        }
+        
+        .stat-info p {
+            color: var(--gray);
+        }
+        
+        /* AI Chat Card */
+        .ai-chat-card {
+            background: var(--white);
+            border-radius: 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            padding: 20px 24px;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .chat-header h3 {
+            flex: 1;
+        }
+        
+        .chat-messages {
+            height: 300px;
+            overflow-y: auto;
+            padding: 20px;
+            background: var(--gray-light);
+        }
+        
+        .message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .user-message {
+            flex-direction: row-reverse;
+        }
+        
+        .user-message .message-content {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .ai-message .message-content {
+            background: var(--white);
+        }
+        
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+        }
+        
+        .chat-input-area {
+            padding: 16px 20px;
+            display: flex;
+            gap: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .chat-input-area input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 30px;
+        }
+        
+        .chat-input-area button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .quick-actions {
+            padding: 12px 20px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .quick-action {
+            padding: 8px 16px;
+            background: var(--gray-light);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        
+        .quick-action:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .recent-section {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .data-table th {
+            background: var(--gray-light);
+            font-weight: 600;
+        }
+        
+        .appointment-item {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            gap: 16px;
+        }
+        
+        .appointment-time {
+            font-weight: 600;
+            min-width: 80px;
+        }
+        
+        .text-center {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray);
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+        }
+        
+        .checked-in {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 101;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+            .header {
+                margin-top: 50px;
+            }
+        }
+        
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px;
+        }
+        
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: var(--gray);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="fas fa-shield-alt"></i>
+                <h1>Admin Login</h1>
+                <p>Enter your credentials to access the dashboard</p>
+            </div>
+            <div id="loginError" class="error-message">
+                <i class="fas fa-exclamation-circle"></i> Invalid username or password
+            </div>
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Username</label>
+                    <input type="text" id="adminUsername" placeholder="Enter username" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="adminPassword" placeholder="Enter password">
+                </div>
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Dashboard Container -->
+    <div id="dashboardContainer" class="dashboard-container">
+        <div class="app-container">
+            <!-- Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <div class="logo">
+                    <i class="fas fa-robot"></i>
+                    <span>ET Receptionist</span>
+                </div>
+                <nav class="nav-menu">
+                    <div class="nav-item active" data-view="dashboard">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="nav-item" data-view="visitors">
+                        <i class="fas fa-users"></i>
+                        <span>Visitors</span>
+                    </div>
+                    <div class="nav-item" data-view="appointments">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Appointments</span>
+                    </div>
+                    <div class="nav-item" data-view="messages">
+                        <i class="fas fa-envelope"></i>
+                        <span>Messages</span>
+                        <span class="badge" id="messageBadge">0</span>
+                    </div>
+                    <div class="nav-item" data-view="staff">
+                        <i class="fas fa-id-badge"></i>
+                        <span>Staff Directory</span>
+                    </div>
+                    <div class="nav-item" data-view="supplies">
+                        <i class="fas fa-boxes"></i>
+                        <span>Supplies</span>
+                    </div>
+                    <div class="nav-item" data-view="calls">
+                        <i class="fas fa-phone-alt"></i>
+                        <span>Call Logs</span>
+                    </div>
+                </nav>
+                <div class="status-card">
+                    <div class="status-time" id="currentTime"></div>
+                    <div class="status-date" id="currentDate"></div>
+                </div>
+            </aside>
+            
+            <!-- Main Content -->
+            <main class="main-content">
+                <header class="header">
+                    <div class="header-title">
+                        <h1 id="pageTitle">Dashboard</h1>
+                        <p id="pageSubtitle">Welcome back! Here's what's happening today.</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="mic-button" id="micButton" title="Click to speak">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        <button class="logout-btn" id="logoutBtn">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </header>
+                
+                <!-- Dashboard View -->
+                <div id="dashboardView" class="view active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-user-friends"></i></div>
+                            <div class="stat-info">
+                                <h3 id="activeVisitorsCount">0</h3>
+                                <p>Active Visitors</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-calendar-day"></i></div>
+                            <div class="stat-info">
+                                <h3 id="todayAppointmentsCount">0</h3>
+                                <p>Today's Appointments</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-envelope"></i></div>
+                            <div class="stat-info">
+                                <h3 id="unreadMessagesCount">0</h3>
+                                <p>Unread Messages</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div class="stat-info">
+                                <h3 id="lowStockCount">0</h3>
+                                <p>Low Stock Items</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- AI Chat Assistant -->
+                    <div class="ai-chat-card">
+                        <div class="chat-header">
+                            <i class="fas fa-robot"></i>
+                            <h3>ET Receptionist Assistant</h3>
+                            <button class="chat-toggle" id="chatToggle" style="background: none; border: none; color: white; cursor: pointer;">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                        </div>
+                        <div class="chat-body" id="chatBody">
+                            <div class="chat-messages" id="chatMessages">
+                                <div class="message ai-message">
+                                    <div class="message-content">
+                                        <p>👋 Hello! I'm your receptionist. How can I help you today?</p>
+                                        <p style="font-size: 10px; opacity: 0.7;">Just now</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-input-area">
+                                <input type="text" id="chatInput" placeholder="Type your message...">
+                                <button id="sendMessageBtn"><i class="fas fa-paper-plane"></i></button>
+                            </div>
+                            <div class="quick-actions">
+                                <button class="quick-action" data-action="checkin">📝 Check In Visitor</button>
+                                <button class="quick-action" data-action="schedule">📅 Schedule Meeting</button>
+                                <button class="quick-action" data-action="message">💬 Send Message</button>
+                                <button class="quick-action" data-action="staff">👥 Find Staff</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Visitors -->
+                    <div class="recent-section">
+                        <div class="section-header">
+                            <h3>Recent Visitors</h3>
+                            <button class="view-all" data-view="visitors" style="background: none; border: none; color: var(--primary); cursor: pointer;">View All</button>
+                        </div>
+                        <div class="visitors-table-container">
+                            <table class="data-table">
+                                <thead><tr><th>Name</th><th>Host</th><th>Check In Time</th><th>Status</th></tr></thead>
+                                <tbody id="recentVisitorsBody"><tr><td colspan="4" class="text-center">Loading...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Today's Appointments -->
+                    <div class="recent-section">
+                        <div class="section-header">
+                            <h3>Today's Appointments</h3>
+                            <button class="view-all" data-view="appointments" style="background: none; border: none; color: var(--primary); cursor: pointer;">View All</button>
+                        </div>
+                        <div id="todayAppointmentsList" class="appointments-list"></div>
+                    </div>
+                </div>
+                
+                <!-- Other Views (simplified) -->
+                <div id="visitorsView" class="view"><div class="view-header"><h2>Visitor Management</h2><button class="btn-primary" id="quickCheckInBtn" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer;">Quick Check In</button></div><div id="visitorsList"></div></div>
+                <div id="appointmentsView" class="view"><div class="view-header"><h2>Appointments</h2><button class="btn-primary" id="scheduleAppointmentBtn" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer;">Schedule Meeting</button></div><div id="appointmentsList"></div></div>
+                <div id="messagesView" class="view"><div class="view-header"><h2>Messages</h2><button class="btn-primary" id="newMessageBtn" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer;">New Message</button></div><div id="messagesList"></div></div>
+                <div id="staffView" class="view"><div class="view-header"><h2>Staff Directory</h2><input type="text" id="staffSearch" placeholder="Search staff..." style="padding: 10px; border: 1px solid #e2e8f0; border-radius: 30px; width: 250px;"></div><div id="staffGrid" class="staff-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;"></div></div>
+                <div id="suppliesView" class="view"><div class="view-header"><h2>Office Supplies</h2></div><div id="suppliesList"></div></div>
+                <div id="callsView" class="view"><div class="view-header"><h2>Call Logs</h2><button class="btn-primary" id="logCallBtn" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer;">Log Call</button></div><div id="callsList"></div></div>
+            </main>
+        </div>
+    </div>
+    
+    <script>
+        // ==================== AUTHENTICATION ====================
+        const ADMIN_USERNAME = "admin";
+        const ADMIN_PASSWORD = "ezzietech@254";
+        
+        function checkAdminLogin() {
+            const loggedIn = sessionStorage.getItem('admin_logged_in');
+            if (loggedIn === 'true') {
+                showDashboard();
+                return true;
+            }
+            return false;
+        }
+        
+        function showDashboard() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('dashboardContainer').classList.add('active');
+            initializeDashboardData();
+        }
+        
+        function logoutAdmin() {
+            sessionStorage.removeItem('admin_logged_in');
+            location.reload();
+        }
+        
+        // Login handler
+        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('adminUsername').value.trim();
+            const password = document.getElementById('adminPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                sessionStorage.setItem('admin_logged_in', 'true');
+                showDashboard();
+            } else {
+                errorDiv.classList.add('show');
+                document.getElementById('adminPassword').value = '';
+                setTimeout(() => errorDiv.classList.remove('show'), 3000);
+            }
+        });
+        
+        document.getElementById('logoutBtn').addEventListener('click', logoutAdmin);
+        
+        // ==================== DASHBOARD FUNCTIONS ====================
+        let visitors = [];
+        let appointments = [];
+        let messages = [];
+        let staff = [];
+        let supplies = [];
+        
+        function initializeDashboardData() {
+            loadDataFromStorage();
+            updateDashboardStats();
+            renderRecentVisitors();
+            renderTodayAppointments();
+            setupEventListeners();
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+        }
+        
+        function loadDataFromStorage() {
+            visitors = JSON.parse(localStorage.getItem('ai_receptionist_visitors') || '[]');
+            appointments = JSON.parse(localStorage.getItem('ai_receptionist_appointments') || '[]');
+            messages = JSON.parse(localStorage.getItem('ai_receptionist_messages') || '[]');
+            staff = JSON.parse(localStorage.getItem('ai_receptionist_staff') || '[]');
+            supplies = JSON.parse(localStorage.getItem('ai_receptionist_supplies') || '[]');
+            
+            if (staff.length === 0) {
+                staff = [
+                    { id: 1, name: "Dr. John Mwangi", department: "IT", position: "IT Director", phone: "+254712345678", office: "Room 201", available: true },
+                    { id: 2, name: "Jane Wanjiku", department: "HR", position: "HR Manager", phone: "+254723456789", office: "Room 105", available: true },
+                    { id: 3, name: "Peter Omondi", department: "Sales", position: "Sales Director", phone: "+254734567890", office: "Room 301", available: true }
+                ];
+                saveStaffDatabase();
+            }
+        }
+        
+        function saveStaffDatabase() {
+            localStorage.setItem('ai_receptionist_staff', JSON.stringify(staff));
+        }
+        
+        function updateDashboardStats() {
+            const activeVisitors = visitors.filter(v => v.status === 'checked_in').length;
+            const todayApps = appointments.filter(a => new Date(a.start_time).toDateString() === new Date().toDateString()).length;
+            const unreadMessages = messages.filter(m => m.status === 'unread').length;
+            const lowStock = supplies.filter(s => s.quantity <= s.min_threshold).length;
+            
+            document.getElementById('activeVisitorsCount').textContent = activeVisitors;
+            document.getElementById('todayAppointmentsCount').textContent = todayApps;
+            document.getElementById('unreadMessagesCount').textContent = unreadMessages;
+            document.getElementById('lowStockCount').textContent = lowStock;
+            document.getElementById('messageBadge').textContent = unreadMessages;
+        }
+        
+        function renderRecentVisitors() {
+            const tbody = document.getElementById('recentVisitorsBody');
+            const activeVisitors = visitors.filter(v => v.status === 'checked_in').slice(0, 5);
+            
+            if (activeVisitors.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center">No active visitors</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = activeVisitors.map(v => `
+                <tr>
+                    <td>${escapeHtml(v.name)}</td>
+                    <td>${escapeHtml(v.host_name)}</td>
+                    <td>${formatTime(v.check_in_time)}</td>
+                    <td><span class="status-badge checked-in">Checked In</span></td>
+                </tr>
+            `).join('');
+        }
+        
+        function renderTodayAppointments() {
+            const container = document.getElementById('todayAppointmentsList');
+            const today = new Date().toDateString();
+            const todayApps = appointments.filter(a => new Date(a.start_time).toDateString() === today);
+            
+            if (todayApps.length === 0) {
+                container.innerHTML = '<div class="text-center">No appointments scheduled for today</div>';
+                return;
+            }
+            
+            container.innerHTML = todayApps.map(a => `
+                <div class="appointment-item">
+                    <div class="appointment-time">${formatTime(a.start_time)}</div>
+                    <div class="appointment-details">
+                        <strong>${escapeHtml(a.title)}</strong> with ${escapeHtml(a.attendee_name)}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // ==================== AI Chat Functions ====================
+        function addChatMessage(message, sender) {
+            const container = document.getElementById('chatMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender === 'user' ? 'user-message' : 'ai-message'}`;
+            msgDiv.innerHTML = `
+                <div class="message-content">
+                    <p>${escapeHtml(message)}</p>
+                    <p style="font-size: 10px; opacity: 0.7;">${new Date().toLocaleTimeString()}</p>
+                </div>
+            `;
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            addChatMessage(message, 'user');
+            input.value = '';
+            
+            setTimeout(() => {
+                addChatMessage(getAIResponse(message), 'ai');
+            }, 500);
+        }
+        
+        function getAIResponse(message) {
+            const msg = message.toLowerCase();
+            if (msg.includes('hello') || msg.includes('hi')) {
+                return "Hello! 👋 How can I assist you today?";
+            }
+            if (msg.includes('check in')) {
+                return "I'll help you check in a visitor. Please tell me their name and who they're here to see.";
+            }
+            if (msg.includes('schedule') || msg.includes('meeting')) {
+                return "I can help schedule a meeting. Please tell me who you want to meet with and when.";
+            }
+            return "I'm here to help! You can ask me to check in visitors, schedule meetings, or find staff members.";
+        }
+        
+        // ==================== Utility Functions ====================
+        function formatTime(dateString) {
+            if (!dateString) return 'Just now';
+            return new Date(dateString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function switchView(view) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelector(`[data-view="${view}"]`).classList.add('active');
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(`${view}View`).classList.add('active');
+            
+            const titles = { dashboard: 'Dashboard', visitors: 'Visitor Management', appointments: 'Appointments', messages: 'Messages', staff: 'Staff Directory', supplies: 'Office Supplies', calls: 'Call Logs' };
+            document.getElementById('pageTitle').textContent = titles[view] || 'Dashboard';
+        }
+        
+        function setupEventListeners() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => switchView(item.dataset.view));
+            });
+            
+            document.querySelectorAll('.view-all').forEach(btn => {
+                btn.addEventListener('click', () => switchView(btn.dataset.view));
+            });
+            
+            document.getElementById('sendMessageBtn').addEventListener('click', sendChatMessage);
+            document.getElementById('chatInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendChatMessage();
+            });
+            
+            document.getElementById('chatToggle').addEventListener('click', () => {
+                document.getElementById('chatBody').style.display = 
+                    document.getElementById('chatBody').style.display === 'none' ? 'block' : 'none';
+            });
+            
+            document.querySelectorAll('.quick-action').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const action = btn.dataset.action;
+                    const prompts = {
+                        checkin: "I need to check in a visitor",
+                        schedule: "I need to schedule a meeting",
+                        message: "I need to send a message",
+                        staff: "Find staff members"
+                    };
+                    document.getElementById('chatInput').value = prompts[action];
+                    sendChatMessage();
+                });
+            });
+            
+            document.getElementById('mobileMenuToggle').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('open');
+            });
+            
+            document.getElementById('quickCheckInBtn').addEventListener('click', () => {
+                const name = prompt("Visitor's name:");
+                if (name) {
+                    const host = prompt("Who are they here to see?");
+                    if (host) {
+                        visitors.push({
+                            id: Date.now(),
+                            name: name,
+                            host_name: host,
+                            check_in_time: new Date().toISOString(),
+                            status: 'checked_in',
+                            badge_number: `V${Math.floor(Math.random() * 10000)}`
+                        });
+                        localStorage.setItem('ai_receptionist_visitors', JSON.stringify(visitors));
+                        updateDashboardStats();
+                        renderRecentVisitors();
+                        addChatMessage(`✅ ${name} checked in successfully! Notified ${host}.`, 'ai');
+                    }
+                }
+            });
+        }
+        
+        // Security: Prevent source view
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'F12' || (e.ctrlKey && e.key === 'u') || (e.ctrlKey && e.key === 's')) {
+                e.preventDefault();
+            }
+        });
+        
+        // Initialize
+        if (!checkAdminLogin()) {
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('dashboardContainer').classList.remove('active');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Staff Portal | ET Receptionist</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f1f5f9;
+            min-height: 100vh;
+        }
+        
+        /* Login Overlay */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 32px;
+            padding: 48px;
+            width: 100%;
+            max-width: 480px;
+            margin: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: slideUp 0.5s ease;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .login-header i {
+            font-size: 56px;
+            color: #4361ee;
+            margin-bottom: 16px;
+        }
+        
+        .login-header h2 {
+            font-size: 28px;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        
+        .login-header p {
+            color: #64748b;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #4361ee;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(67, 97, 238, 0.3);
+        }
+        
+        .link-btn {
+            background: none;
+            border: none;
+            color: #4361ee;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 0 8px;
+        }
+        
+        .link-btn:hover {
+            text-decoration: underline;
+        }
+        
+        .error-message, .success-message {
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+            text-align: center;
+        }
+        
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .error-message.show, .success-message.show {
+            display: block;
+        }
+        
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background: #e2e8f0;
+        }
+        
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+        
+        .divider span {
+            background: white;
+            padding: 0 10px;
+            color: #94a3b8;
+            font-size: 12px;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Staff Portal Content */
+        .staff-portal-content {
+            display: none;
+        }
+        
+        .staff-portal-content.active {
+            display: block;
+        }
+        
+        /* Staff Portal Styles */
+        .staff-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .staff-sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .staff-logo {
+            padding: 24px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .staff-logo i {
+            font-size: 40px;
+            color: #4361ee;
+        }
+        
+        .staff-logo h2 {
+            font-size: 18px;
+            margin-top: 8px;
+        }
+        
+        .staff-nav {
+            padding: 20px;
+        }
+        
+        .staff-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            margin: 4px 0;
+            border-radius: 12px;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .staff-nav-item:hover {
+            background: #f1f5f9;
+            color: #4361ee;
+        }
+        
+        .staff-nav-item.active {
+            background: #4361ee;
+            color: white;
+        }
+        
+        .staff-main {
+            flex: 1;
+            margin-left: 280px;
+            padding: 24px;
+        }
+        
+        .staff-header {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .staff-welcome h1 {
+            font-size: 24px;
+        }
+        
+        .staff-welcome p {
+            color: #64748b;
+            margin-top: 4px;
+        }
+        
+        .staff-status {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .availability-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f1f5f9;
+            padding: 8px 16px;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+        
+        .toggle-switch {
+            width: 50px;
+            height: 24px;
+            background: #cbd5e1;
+            border-radius: 24px;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .toggle-switch.active {
+            background: #10b981;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+        
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(26px);
+        }
+        
+        .staff-logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .stats-grid-staff {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card-staff {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+        }
+        
+        .stat-card-staff i {
+            font-size: 32px;
+            color: #4361ee;
+            margin-bottom: 12px;
+        }
+        
+        .stat-card-staff h3 {
+            font-size: 28px;
+        }
+        
+        .staff-section {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            display: none;
+        }
+        
+        .staff-section.active {
+            display: block;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .message-card, .appointment-card, .visitor-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid #4361ee;
+        }
+        
+        .message-card.unread {
+            background: #eef2ff;
+            border-left-color: #f59e0b;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            background: #e2e8f0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .btn-confirm {
+            padding: 8px 16px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+        }
+        
+        @media (max-width: 768px) {
+            .staff-sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+            }
+            .staff-main {
+                margin-left: 0;
+            }
+            .mobile-menu-btn {
+                display: block;
+                position: fixed;
+                top: 16px;
+                left: 16px;
+                z-index: 1001;
+                background: #4361ee;
+                color: white;
+                border: none;
+                padding: 12px;
+                border-radius: 12px;
+                cursor: pointer;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .mobile-menu-btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Login Overlay -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-card" id="loginCard">
+            <!-- Login Form -->
+            <div id="loginFormView">
+                <div class="login-header">
+                    <i class="fas fa-user-tie"></i>
+                    <h2>Staff Portal</h2>
+                    <p>Secure access for employees</p>
+                </div>
+                <div id="loginErrorMsg" class="error-message"></div>
+                <form id="staffLoginForm">
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Select Your Name</label>
+                        <select id="staffSelect" required>
+                            <option value="">-- Select Staff Member --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-lock"></i> Password</label>
+                        <input type="password" id="staffPassword" placeholder="Enter your password">
+                    </div>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </form>
+                <div class="divider">
+                    <span>OR</span>
+                </div>
+                <div style="text-align: center;">
+                    <button class="link-btn" onclick="showSignupView()">
+                        <i class="fas fa-user-plus"></i> First Time? Create Account
+                    </button>
+                    <button class="link-btn" onclick="showForgotView()">
+                        <i class="fas fa-key"></i> Forgot Password?
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Signup Form -->
+            <div id="signupFormView" style="display: none;">
+                <div class="login-header">
+                    <i class="fas fa-user-plus"></i>
+                    <h2>Create Account</h2>
+                    <p>Set up your staff portal access</p>
+                </div>
+                <div id="signupErrorMsg" class="error-message"></div>
+                <div id="signupSuccessMsg" class="success-message"></div>
+                <form id="staffSignupForm">
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Select Your Name</label>
+                        <select id="signupStaffSelect" required>
+                            <option value="">-- Select Staff Member --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-lock"></i> Create Password</label>
+                        <input type="password" id="signupPassword" placeholder="Create a secure password" required>
+                        <small style="color: #64748b;">Minimum 6 characters</small>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-check-circle"></i> Confirm Password</label>
+                        <input type="password" id="signupConfirmPassword" placeholder="Confirm your password" required>
+                    </div>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-user-check"></i> Create Account
+                    </button>
+                </form>
+                <button class="link-btn" onclick="showLoginView()" style="margin-top: 20px; display: block; width: 100%;">
+                    <i class="fas fa-arrow-left"></i> Back to Login
+                </button>
+            </div>
+            
+            <!-- Forgot Password Form -->
+            <div id="forgotFormView" style="display: none;">
+                <div class="login-header">
+                    <i class="fas fa-key"></i>
+                    <h2>Reset Password</h2>
+                    <p>Enter your name and new password</p>
+                </div>
+                <div id="forgotErrorMsg" class="error-message"></div>
+                <div id="forgotSuccessMsg" class="success-message"></div>
+                <form id="staffForgotForm">
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Select Your Name</label>
+                        <select id="forgotStaffSelect" required>
+                            <option value="">-- Select Staff Member --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-lock"></i> New Password</label>
+                        <input type="password" id="forgotNewPassword" placeholder="Enter new password" required>
+                        <small style="color: #64748b;">Minimum 6 characters</small>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-check-circle"></i> Confirm New Password</label>
+                        <input type="password" id="forgotConfirmPassword" placeholder="Confirm new password" required>
+                    </div>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Reset Password
+                    </button>
+                </form>
+                <button class="link-btn" onclick="showLoginView()" style="margin-top: 20px; display: block; width: 100%;">
+                    <i class="fas fa-arrow-left"></i> Back to Login
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Staff Portal Content -->
+    <div id="staffPortalContent" class="staff-portal-content">
+        <div class="staff-container">
+            <aside class="staff-sidebar" id="staffSidebar">
+                <div class="staff-logo">
+                    <i class="fas fa-user-tie"></i>
+                    <h2>Staff Portal</h2>
+                    <p id="staffNameDisplay" style="font-size: 12px;">Loading...</p>
+                </div>
+                <nav class="staff-nav">
+                    <div class="staff-nav-item active" data-section="dashboard">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="staff-nav-item" data-section="messages">
+                        <i class="fas fa-envelope"></i>
+                        <span>Messages</span>
+                        <span id="messageBadgeStaff" style="margin-left: auto; background: #ef4444; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px;">0</span>
+                    </div>
+                    <div class="staff-nav-item" data-section="appointments">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>My Schedule</span>
+                    </div>
+                    <div class="staff-nav-item" data-section="visitors">
+                        <i class="fas fa-users"></i>
+                        <span>My Visitors</span>
+                        <span id="visitorBadgeStaff" style="margin-left: auto; background: #10b981; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px;">0</span>
+                    </div>
+                    <div class="staff-nav-item" data-section="profile">
+                        <i class="fas fa-user-circle"></i>
+                        <span>My Profile</span>
+                    </div>
+                </nav>
+            </aside>
+            
+            <main class="staff-main">
+                <div class="staff-header">
+                    <div class="staff-welcome">
+                        <h1 id="welcomeMessage">Welcome, Staff Member!</h1>
+                        <p id="currentDateTimeStaff"></p>
+                    </div>
+                    <div class="staff-status">
+                        <div class="availability-toggle" id="availabilityToggle">
+                            <span>Status:</span>
+                            <div class="toggle-switch" id="statusToggle">
+                                <div class="toggle-slider"></div>
+                            </div>
+                            <span id="availabilityText">Available</span>
+                        </div>
+                        <button class="staff-logout-btn" id="staffLogoutBtnPortal">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Dashboard Section -->
+                <div id="dashboardSection" class="staff-section active">
+                    <div class="stats-grid-staff">
+                        <div class="stat-card-staff">
+                            <i class="fas fa-envelope"></i>
+                            <h3 id="dashboardUnreadCount">0</h3>
+                            <p>Unread Messages</p>
+                        </div>
+                        <div class="stat-card-staff">
+                            <i class="fas fa-calendar"></i>
+                            <h3 id="dashboardTodayCount">0</h3>
+                            <p>Today's Meetings</p>
+                        </div>
+                        <div class="stat-card-staff">
+                            <i class="fas fa-user-friends"></i>
+                            <h3 id="dashboardVisitorsCount">0</h3>
+                            <p>Waiting Visitors</p>
+                        </div>
+                        <div class="stat-card-staff">
+                            <i class="fas fa-clock"></i>
+                            <h3 id="dashboardNextMeeting">-</h3>
+                            <p>Next Meeting</p>
+                        </div>
+                    </div>
+                    <div style="background: #f8fafc; border-radius: 20px; padding: 24px;">
+                        <h3>Quick Actions</h3>
+                        <div style="display: flex; gap: 12px; margin-top: 16px;">
+                            <button class="btn-small" onclick="sendQuickMessage()">
+                                <i class="fas fa-paper-plane"></i> Send Message
+                            </button>
+                            <button class="btn-small" onclick="viewSchedule()">
+                                <i class="fas fa-calendar-plus"></i> View Schedule
+                            </button>
+                            <button class="btn-small" onclick="checkWaitingVisitors()">
+                                <i class="fas fa-user-check"></i> Check Visitors
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Messages Section -->
+                <div id="messagesSection" class="staff-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-envelope"></i> My Messages</h2>
+                    </div>
+                    <div id="staffMessagesList" class="messages-list-staff"></div>
+                </div>
+                
+                <!-- Appointments Section -->
+                <div id="appointmentsSection" class="staff-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-calendar-alt"></i> My Schedule</h2>
+                    </div>
+                    <div id="staffAppointmentsList"></div>
+                </div>
+                
+                <!-- Visitors Section -->
+                <div id="visitorsSection" class="staff-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-user-friends"></i> My Visitors</h2>
+                    </div>
+                    <div id="staffVisitorsList"></div>
+                </div>
+                
+                <!-- Profile Section -->
+                <div id="profileSection" class="staff-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-user-circle"></i> My Profile</h2>
+                    </div>
+                    <div id="staffProfile" style="background: #f8fafc; border-radius: 20px; padding: 24px;"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <script>
+        // ==================== Staff Database ====================
+        let staffDatabase = [];
+        let currentStaff = null;
+        let visitors = [];
+        let appointments = [];
+        let messages = [];
+        
+        function initStaffDatabase() {
+            const stored = localStorage.getItem('staff_portal_data');
+            if (stored) {
+                staffDatabase = JSON.parse(stored);
+            } else {
+                staffDatabase = [
+                    { id: 1, name: "Dr. John Mwangi", email: "john.mwangi@company.com", department: "Information Technology", position: "IT Director", phone: "+254712345678", office: "Room 201", hasPassword: false, password: "" },
+                    { id: 2, name: "Jane Wanjiku", email: "jane.wanjiku@company.com", department: "Human Resources", position: "HR Manager", phone: "+254723456789", office: "Room 105", hasPassword: false, password: "" },
+                    { id: 3, name: "Peter Omondi", email: "peter.omondi@company.com", department: "Sales & Marketing", position: "Sales Director", phone: "+254734567890", office: "Room 301", hasPassword: false, password: "" },
+                    { id: 4, name: "Mary Wambui", email: "mary.wambui@company.com", department: "Finance", position: "Finance Controller", phone: "+254745678901", office: "Room 108", hasPassword: false, password: "" },
+                    { id: 5, name: "James Kariuki", email: "james.kariuki@company.com", department: "Operations", position: "Operations Manager", phone: "+254756789012", office: "Room 205", hasPassword: false, password: "" }
+                ];
+                saveStaffDatabase();
+            }
+            updateStaffSelects();
+        }
+        
+        function saveStaffDatabase() {
+            localStorage.setItem('staff_portal_data', JSON.stringify(staffDatabase));
+        }
+        
+        function updateStaffSelects() {
+            const options = staffDatabase.map(s => `<option value="${s.id}">${s.name} - ${s.position}</option>`).join('');
+            document.getElementById('staffSelect').innerHTML = '<option value="">-- Select Staff Member --</option>' + options;
+            document.getElementById('signupStaffSelect').innerHTML = '<option value="">-- Select Staff Member --</option>' + options;
+            document.getElementById('forgotStaffSelect').innerHTML = '<option value="">-- Select Staff Member --</option>' + options;
+        }
+        
+        function hashPassword(password) {
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return hash.toString();
+        }
+        
+        // View Management
+        function showLoginView() {
+            document.getElementById('loginFormView').style.display = 'block';
+            document.getElementById('signupFormView').style.display = 'none';
+            document.getElementById('forgotFormView').style.display = 'none';
+        }
+        
+        function showSignupView() {
+            document.getElementById('loginFormView').style.display = 'none';
+            document.getElementById('signupFormView').style.display = 'block';
+            document.getElementById('forgotFormView').style.display = 'none';
+        }
+        
+        function showForgotView() {
+            document.getElementById('loginFormView').style.display = 'none';
+            document.getElementById('signupFormView').style.display = 'none';
+            document.getElementById('forgotFormView').style.display = 'block';
+        }
+        
+        function showError(elementId, message) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 3000);
+        }
+        
+        function showSuccess(elementId, message) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 3000);
+        }
+        
+        // Signup Handler
+        document.getElementById('staffSignupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const staffId = parseInt(document.getElementById('signupStaffSelect').value);
+            const password = document.getElementById('signupPassword').value;
+            const confirm = document.getElementById('signupConfirmPassword').value;
+            
+            if (!staffId) { showError('signupErrorMsg', 'Please select your name'); return; }
+            if (password.length < 6) { showError('signupErrorMsg', 'Password must be at least 6 characters'); return; }
+            if (password !== confirm) { showError('signupErrorMsg', 'Passwords do not match'); return; }
+            
+            const staff = staffDatabase.find(s => s.id === staffId);
+            if (staff) {
+                staff.hasPassword = true;
+                staff.password = hashPassword(password);
+                saveStaffDatabase();
+                showSuccess('signupSuccessMsg', 'Account created successfully! Please login.');
+                setTimeout(() => {
+                    showLoginView();
+                    document.getElementById('signupPassword').value = '';
+                    document.getElementById('signupConfirmPassword').value = '';
+                }, 1500);
+            }
+        });
+        
+        // Login Handler
+        document.getElementById('staffLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const staffId = parseInt(document.getElementById('staffSelect').value);
+            const password = document.getElementById('staffPassword').value;
+            
+            if (!staffId) { showError('loginErrorMsg', 'Please select your name'); return; }
+            
+            const staff = staffDatabase.find(s => s.id === staffId);
+            if (!staff.hasPassword) {
+                showError('loginErrorMsg', 'No account found. Please create an account first.');
+                showSignupView();
+                return;
+            }
+            
+            if (staff.password === hashPassword(password)) {
+                currentStaff = staff;
+                sessionStorage.setItem('staff_logged_in', 'true');
+                sessionStorage.setItem('current_staff', JSON.stringify(staff));
+                showStaffPortal();
+            } else {
+                showError('loginErrorMsg', 'Invalid password. Please try again.');
+                document.getElementById('staffPassword').value = '';
+            }
+        });
+        
+        // Forgot Password Handler
+        document.getElementById('staffForgotForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const staffId = parseInt(document.getElementById('forgotStaffSelect').value);
+            const newPassword = document.getElementById('forgotNewPassword').value;
+            const confirm = document.getElementById('forgotConfirmPassword').value;
+            
+            if (!staffId) { showError('forgotErrorMsg', 'Please select your name'); return; }
+            if (newPassword.length < 6) { showError('forgotErrorMsg', 'Password must be at least 6 characters'); return; }
+            if (newPassword !== confirm) { showError('forgotErrorMsg', 'Passwords do not match'); return; }
+            
+            const staff = staffDatabase.find(s => s.id === staffId);
+            if (staff) {
+                staff.password = hashPassword(newPassword);
+                staff.hasPassword = true;
+                saveStaffDatabase();
+                showSuccess('forgotSuccessMsg', 'Password reset successfully! Please login.');
+                setTimeout(() => {
+                    showLoginView();
+                    document.getElementById('forgotNewPassword').value = '';
+                    document.getElementById('forgotConfirmPassword').value = '';
+                }, 1500);
+            }
+        });
+        
+        // Show Staff Portal
+        function showStaffPortal() {
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('staffPortalContent').classList.add('active');
+            
+            document.getElementById('staffNameDisplay').innerHTML = `${currentStaff.name}<br><span style="font-size: 10px;">${currentStaff.position}</span>`;
+            document.getElementById('welcomeMessage').innerHTML = `Welcome, ${currentStaff.name.split(' ')[0]}! 👋`;
+            
+            loadStaffData();
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            
+            // Setup toggle
+            const statusToggle = document.getElementById('statusToggle');
+            statusToggle.addEventListener('click', toggleAvailability);
+        }
+        
+        function toggleAvailability() {
+            if (currentStaff) {
+                currentStaff.available = !currentStaff.available;
+                const toggle = document.getElementById('statusToggle');
+                const text = document.getElementById('availabilityText');
+                if (currentStaff.available) {
+                    toggle.classList.add('active');
+                    text.textContent = 'Available';
+                } else {
+                    toggle.classList.remove('active');
+                    text.textContent = 'Busy';
+                }
+                const index = staffDatabase.findIndex(s => s.id === currentStaff.id);
+                if (index !== -1) staffDatabase[index].available = currentStaff.available;
+                saveStaffDatabase();
+            }
+        }
+        
+        function loadStaffData() {
+            // Load from localStorage
+            const allVisitors = JSON.parse(localStorage.getItem('ai_receptionist_visitors') || '[]');
+            const allAppointments = JSON.parse(localStorage.getItem('ai_receptionist_appointments') || '[]');
+            const allMessages = JSON.parse(localStorage.getItem('ai_receptionist_messages') || '[]');
+            
+            visitors = allVisitors.filter(v => v.host_name === currentStaff.name && v.status === 'checked_in');
+            appointments = allAppointments.filter(a => a.host_name === currentStaff.name || a.attendee_name === currentStaff.name);
+            messages = allMessages.filter(m => m.recipient === currentStaff.name);
+            
+            const unreadCount = messages.filter(m => m.status === 'unread').length;
+            const todayCount = appointments.filter(a => new Date(a.start_time).toDateString() === new Date().toDateString()).length;
+            
+            document.getElementById('dashboardUnreadCount').textContent = unreadCount;
+            document.getElementById('dashboardTodayCount').textContent = todayCount;
+            document.getElementById('dashboardVisitorsCount').textContent = visitors.length;
+            document.getElementById('messageBadgeStaff').textContent = unreadCount;
+            document.getElementById('visitorBadgeStaff').textContent = visitors.length;
+            
+            const nextMeeting = appointments.filter(a => new Date(a.start_time) > new Date()).sort((a,b) => new Date(a.start_time) - new Date(b.start_time))[0];
+            document.getElementById('dashboardNextMeeting').textContent = nextMeeting ? new Date(nextMeeting.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'No meetings';
+            
+            renderMessages();
+            renderAppointments();
+            renderVisitors();
+            renderProfile();
+        }
+        
+        function renderMessages() {
+            const container = document.getElementById('staffMessagesList');
+            if (messages.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No messages</p></div>';
+                return;
+            }
+            container.innerHTML = messages.map(msg => `
+                <div class="message-card ${msg.status === 'unread' ? 'unread' : ''}" onclick="viewMessage(${msg.id})">
+                    <div><strong>From:</strong> ${escapeHtml(msg.sender_name)}</div>
+                    <div><strong>Message:</strong> ${escapeHtml(msg.message.substring(0, 100))}${msg.message.length > 100 ? '...' : ''}</div>
+                    <div style="font-size: 11px; color: #64748b; margin-top: 8px;">${formatTime(msg.created_at)}</div>
+                </div>
+            `).join('');
+        }
+        
+        function renderAppointments() {
+            const container = document.getElementById('staffAppointmentsList');
+            if (appointments.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-alt"></i><p>No appointments</p></div>';
+                return;
+            }
+            container.innerHTML = appointments.map(app => `
+                <div class="appointment-card">
+                    <strong>${escapeHtml(app.title)}</strong>
+                    <div>With: ${escapeHtml(app.attendee_name)}</div>
+                    <div>Time: ${formatDateTime(app.start_time)}</div>
+                    <div>Room: ${app.room || 'Conference Room'}</div>
+                </div>
+            `).join('');
+        }
+        
+        function renderVisitors() {
+            const container = document.getElementById('staffVisitorsList');
+            if (visitors.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-user-friends"></i><p>No visitors waiting</p></div>';
+                return;
+            }
+            container.innerHTML = visitors.map(v => `
+                <div class="visitor-card">
+                    <strong>${escapeHtml(v.name)}</strong>
+                    <div>${v.company || 'Visitor'} - Purpose: ${v.purpose || 'Meeting'}</div>
+                    <div>Arrived: ${formatTime(v.check_in_time)}</div>
+                    <div>Badge: ${v.badge_number}</div>
+                    <button class="btn-confirm" onclick="confirmVisitor(${v.id})" style="margin-top: 8px;">
+                        <i class="fas fa-check"></i> I'm Here
+                    </button>
+                </div>
+            `).join('');
+        }
+        
+        function renderProfile() {
+            const container = document.getElementById('staffProfile');
+            container.innerHTML = `
+                <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+                    <div style="text-align: center;">
+                        <i class="fas fa-user-circle" style="font-size: 80px; color: #4361ee;"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <h3>${escapeHtml(currentStaff.name)}</h3>
+                        <p><strong>Position:</strong> ${currentStaff.position}</p>
+                        <p><strong>Department:</strong> ${currentStaff.department}</p>
+                        <p><strong>Email:</strong> ${currentStaff.email}</p>
+                        <p><strong>Phone:</strong> ${currentStaff.phone}</p>
+                        <p><strong>Office:</strong> ${currentStaff.office}</p>
+                        <p><strong>Status:</strong> <span style="color: ${currentStaff.available ? '#10b981' : '#ef4444'}">${currentStaff.available ? 'Available' : 'Busy'}</span></p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function viewMessage(messageId) {
+            const allMessages = JSON.parse(localStorage.getItem('ai_receptionist_messages') || '[]');
+            const msg = allMessages.find(m => m.id === messageId);
+            if (msg) {
+                msg.status = 'read';
+                localStorage.setItem('ai_receptionist_messages', JSON.stringify(allMessages));
+                alert(`From: ${msg.sender_name}\n\nMessage: ${msg.message}`);
+                loadStaffData();
+            }
+        }
+        
+        function confirmVisitor(visitorId) {
+            const allVisitors = JSON.parse(localStorage.getItem('ai_receptionist_visitors') || '[]');
+            const visitor = allVisitors.find(v => v.id === visitorId);
+            if (visitor) {
+                visitor.status = 'checked_out';
+                visitor.check_out_time = new Date().toISOString();
+                localStorage.setItem('ai_receptionist_visitors', JSON.stringify(allVisitors));
+                alert(`Confirmed: ${visitor.name} has been welcomed.`);
+                loadStaffData();
+            }
+        }
+        
+        function sendQuickMessage() {
+            const message = prompt('Type your message to reception:');
+            if (message) {
+                let allMessages = JSON.parse(localStorage.getItem('ai_receptionist_messages') || '[]');
+                allMessages.push({
+                    id: Date.now(),
+                    recipient: 'Reception Desk',
+                    sender_name: currentStaff.name,
+                    message: message,
+                    priority: 'normal',
+                    status: 'unread',
+                    created_at: new Date().toISOString()
+                });
+                localStorage.setItem('ai_receptionist_messages', JSON.stringify(allMessages));
+                alert('Message sent to reception!');
+                loadStaffData();
+            }
+        }
+        
+        function viewSchedule() {
+            document.querySelector('[data-section="appointments"]').click();
+        }
+        
+        function checkWaitingVisitors() {
+            document.querySelector('[data-section="visitors"]').click();
+        }
+        
+        // Navigation
+        document.querySelectorAll('.staff-nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const section = item.dataset.section;
+                document.querySelectorAll('.staff-nav-item').forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+                document.querySelectorAll('.staff-section').forEach(s => s.classList.remove('active'));
+                document.getElementById(`${section}Section`).classList.add('active');
+            });
+        });
+        
+        document.getElementById('staffLogoutBtnPortal').addEventListener('click', () => {
+            sessionStorage.removeItem('staff_logged_in');
+            sessionStorage.removeItem('current_staff');
+            location.reload();
+        });
+        
+        document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+            document.getElementById('staffSidebar').classList.toggle('open');
+        });
+        
+        // Utility Functions
+        function formatTime(dateString) {
+            if (!dateString) return 'Just now';
+            return new Date(dateString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        function formatDateTime(dateString) {
+            return new Date(dateString).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+        
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('currentDateTimeStaff').textContent = now.toLocaleString('en-US', { weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Security
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'F12' || (e.ctrlKey && e.key === 'u') || (e.ctrlKey && e.key === 's')) {
+                e.preventDefault();
+            }
+        });
+        
+        // Check existing session
+        const loggedIn = sessionStorage.getItem('staff_logged_in');
+        const storedStaff = sessionStorage.getItem('current_staff');
+        if (loggedIn === 'true' && storedStaff) {
+            currentStaff = JSON.parse(storedStaff);
+            showStaffPortal();
+        } else {
+            initStaffDatabase();
+            document.getElementById('loginOverlay').style.display = 'flex';
+            document.getElementById('staffPortalContent').classList.remove('active');
+            showLoginView();
+        }
+        
+        // Make functions global
+        window.viewMessage = viewMessage;
+        window.confirmVisitor = confirmVisitor;
+        window.sendQuickMessage = sendQuickMessage;
+        window.viewSchedule = viewSchedule;
+        window.checkWaitingVisitors = checkWaitingVisitors;
+    </script>
+</body>
+</html>

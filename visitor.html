@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Visitor Check-In | ET Receptionist</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .visitor-container {
+            max-width: 550px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .visitor-header {
+            background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
+            color: white;
+            padding: 32px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .qr-code {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .qr-code:hover {
+            transform: scale(1.05);
+        }
+        
+        .qr-code img {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .visitor-header i {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .visitor-header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        
+        .visitor-header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .visitor-body {
+            padding: 32px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4361ee;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        .btn-checkin {
+            width: 100%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 16px;
+        }
+        
+        .btn-checkin:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.3);
+        }
+        
+        .ai-chat-section {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 24px;
+        }
+        
+        .ai-chat-section h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #1e293b;
+        }
+        
+        .chat-messages-visitor {
+            height: 200px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+            padding: 8px;
+        }
+        
+        .visitor-message {
+            background: #e2e8f0;
+            padding: 10px 14px;
+            border-radius: 18px;
+            margin-bottom: 8px;
+            max-width: 90%;
+            font-size: 14px;
+        }
+        
+        .visitor-message.user {
+            background: #e2e8f0;
+            margin-right: auto;
+        }
+        
+        .visitor-message.ai {
+            background: #4361ee;
+            color: white;
+            margin-left: auto;
+        }
+        
+        .chat-input-visitor {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .chat-input-visitor input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            font-family: inherit;
+        }
+        
+        .chat-input-visitor button {
+            background: #4361ee;
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .chat-input-visitor button:hover {
+            transform: scale(1.05);
+        }
+        
+        .success-message {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .success-message.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .badge-preview {
+            text-align: center;
+            padding: 20px;
+            background: #f1f5f9;
+            border-radius: 16px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .badge-preview.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .badge-number {
+            font-family: monospace;
+            font-size: 32px;
+            font-weight: bold;
+            color: #4361ee;
+            letter-spacing: 2px;
+        }
+        
+        .visitor-info {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 14px;
+            color: #64748b;
+        }
+        
+        .quick-actions-visitor {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+        
+        .quick-action-visitor {
+            padding: 6px 12px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .quick-action-visitor:hover {
+            background: #4361ee;
+            color: white;
+            border-color: #4361ee;
+        }
+        
+        @media (max-width: 640px) {
+            .visitor-body {
+                padding: 24px;
+            }
+            .visitor-header {
+                padding: 24px;
+            }
+            .visitor-header h1 {
+                font-size: 24px;
+            }
+            .qr-code img {
+                width: 40px;
+                height: 40px;
+            }
+        }
+        
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 10px 14px;
+            background: #4361ee;
+            border-radius: 18px;
+            width: fit-content;
+            margin-left: auto;
+        }
+        
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-5px); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="visitor-container">
+        <div class="visitor-header">
+            <div class="qr-code" id="qrCodeBtn" title="Scan to bookmark this page">
+                <img id="qrCodeImage" alt="QR Code">
+            </div>
+            <i class="fas fa-user-friends"></i>
+            <h1>Visitor Check-In</h1>
+            <p>Welcome! Please check in to let your host know you've arrived</p>
+        </div>
+        
+        <div class="visitor-body">
+            <div id="successMessage" class="success-message">
+                <i class="fas fa-check-circle"></i> 
+                <strong>Check-in Successful!</strong>
+                <p>Your host has been notified. Please have a seat in the waiting area.</p>
+            </div>
+            
+            <form id="visitorCheckinForm">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Full Name *</label>
+                    <input type="text" id="visitorName" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-building"></i> Company</label>
+                    <input type="text" id="visitorCompany" placeholder="Your company name (optional)">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="visitorEmail" placeholder="your@email.com">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-phone"></i> Phone</label>
+                    <input type="tel" id="visitorPhone" placeholder="Your phone number">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-user-tie"></i> Who are you here to see? *</label>
+                    <select id="visitorHost" required>
+                        <option value="">Select a staff member...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-clipboard-list"></i> Purpose of Visit</label>
+                    <select id="visitorPurpose">
+                        <option>Meeting</option>
+                        <option>Interview</option>
+                        <option>Delivery</option>
+                        <option>Service Call</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn-checkin">
+                    <i class="fas fa-sign-in-alt"></i> Check In
+                </button>
+            </form>
+            
+            <div id="badgePreview" class="badge-preview">
+                <i class="fas fa-id-card" style="font-size: 32px; color: #4361ee;"></i>
+                <h4>Visitor Badge</h4>
+                <div class="badge-number" id="badgeNumber"></div>
+                <div class="visitor-info" id="visitorInfo"></div>
+                <button onclick="printBadge()" class="btn-checkin" style="background: #4361ee; margin-top: 12px;">
+                    <i class="fas fa-print"></i> Print Badge
+                </button>
+            </div>
+            
+            <!-- AI Chat Assistant for Visitors -->
+            <div class="ai-chat-section">
+                <h3><i class="fas fa-robot"></i> Need Help? Ask Me Anything!</h3>
+                <div id="visitorChatMessages" class="chat-messages-visitor">
+                    <div class="visitor-message ai">
+                        👋 Hello! I'm your ezzietech assistant. I can help you with:<br>
+                        • Office hours<br>
+                        • Directions<br>
+                        • Wait times<br>
+                        • WiFi access<br>
+                        • Facilities
+                    </div>
+                </div>
+                <div class="quick-actions-visitor">
+                    <button class="quick-action-visitor" onclick="askQuestion('What are your office hours?')">🕐 Hours</button>
+                    <button class="quick-action-visitor" onclick="askQuestion('Where is the restroom?')">🚻 Restroom</button>
+                    <button class="quick-action-visitor" onclick="askQuestion('How do I connect to WiFi?')">📶 WiFi</button>
+                    <button class="quick-action-visitor" onclick="askQuestion('Where can I park?')">🅿️ Parking</button>
+                    <button class="quick-action-visitor" onclick="askQuestion('How long will I wait?')">⏱️ Wait Time</button>
+                </div>
+                <div class="chat-input-visitor">
+                    <input type="text" id="visitorChatInput" placeholder="Type your question here...">
+                    <button id="visitorSendBtn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ==================== Global Variables ====================
+        let staffList = [];
+        let isTyping = false;
+        
+        // ==================== Load Staff from Storage ====================
+        function loadStaffForVisitor() {
+            const storedStaff = localStorage.getItem('ai_receptionist_staff');
+            if (storedStaff) {
+                staffList = JSON.parse(storedStaff);
+            } else {
+                staffList = [
+                    { id: 1, name: "Dr. John Mwangi", department: "Information Technology", position: "IT Director" },
+                    { id: 2, name: "Jane Wanjiku", department: "Human Resources", position: "HR Manager" },
+                    { id: 3, name: "Peter Omondi", department: "Sales & Marketing", position: "Sales Director" },
+                    { id: 4, name: "Mary Wambui", department: "Finance", position: "Finance Controller" },
+                    { id: 5, name: "James Kariuki", department: "Operations", position: "Operations Manager" }
+                ];
+            }
+            
+            const hostSelect = document.getElementById('visitorHost');
+            hostSelect.innerHTML = '<option value="">Select a staff member...</option>';
+            staffList.forEach(staff => {
+                hostSelect.innerHTML += `<option value="${staff.name}">${staff.name} - ${staff.position} (${staff.department})</option>`;
+            });
+        }
+        
+        // ==================== Generate QR Code ====================
+        function generateQRCode() {
+            const currentUrl = window.location.href;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(currentUrl)}`;
+            document.getElementById('qrCodeImage').src = qrUrl;
+        }
+        
+        // ==================== Handle Visitor Check-in ====================
+        document.getElementById('visitorCheckinForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const visitorName = document.getElementById('visitorName').value.trim();
+            const hostName = document.getElementById('visitorHost').value;
+            
+            if (!visitorName || !hostName) {
+                alert('Please enter your name and select a host.');
+                return;
+            }
+            
+            const visitorData = {
+                id: Date.now(),
+                name: visitorName,
+                company: document.getElementById('visitorCompany').value,
+                email: document.getElementById('visitorEmail').value,
+                phone: document.getElementById('visitorPhone').value,
+                host_name: hostName,
+                purpose: document.getElementById('visitorPurpose').value,
+                check_in_time: new Date().toISOString(),
+                badge_number: `V${Math.floor(Math.random() * 10000)}`,
+                status: 'checked_in'
+            };
+            
+            // Save to localStorage
+            let visitors = JSON.parse(localStorage.getItem('ai_receptionist_visitors') || '[]');
+            visitors.push(visitorData);
+            localStorage.setItem('ai_receptionist_visitors', JSON.stringify(visitors));
+            
+            // Create message for host
+            let messages = JSON.parse(localStorage.getItem('ai_receptionist_messages') || '[]');
+            messages.unshift({
+                id: Date.now(),
+                recipient: visitorData.host_name,
+                recipient_email: '',
+                sender_name: visitorData.name,
+                message: `🎫 ${visitorData.name} from ${visitorData.company || 'visitor'} has arrived for ${visitorData.purpose}. They are checked in and waiting in the reception area. Badge #${visitorData.badge_number}`,
+                priority: 'high',
+                status: 'unread',
+                created_at: new Date().toISOString()
+            });
+            localStorage.setItem('ai_receptionist_messages', JSON.stringify(messages));
+            
+            // Show success message and badge
+            document.getElementById('successMessage').classList.add('show');
+            document.getElementById('badgeNumber').textContent = visitorData.badge_number;
+            document.getElementById('visitorInfo').innerHTML = `
+                <strong>${visitorData.name}</strong><br>
+                Visiting: ${visitorData.host_name}<br>
+                Purpose: ${visitorData.purpose}<br>
+                Time: ${new Date().toLocaleTimeString()}
+            `;
+            document.getElementById('badgePreview').classList.add('show');
+            
+            // Clear form
+            document.getElementById('visitorCheckinForm').reset();
+            
+            // Add confirmation to chat
+            addVisitorMessage(`✅ Check-in successful! Your badge number is ${visitorData.badge_number}. ${visitorData.host_name} has been notified and will be with you shortly. Please have a seat in the waiting area.`, 'ai');
+            
+            // Trigger storage event to update other tabs
+            window.dispatchEvent(new StorageEvent('storage', { key: 'ai_receptionist_visitors' }));
+        });
+        
+        // ==================== Visitor Chat Functions ====================
+        function addVisitorMessage(message, sender) {
+            const chatContainer = document.getElementById('visitorChatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `visitor-message ${sender}`;
+            messageDiv.innerHTML = sender === 'ai' ? `🤖 ${message}` : `👤 ${message}`;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        function showTypingIndicator() {
+            if (isTyping) return;
+            isTyping = true;
+            const chatContainer = document.getElementById('visitorChatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'visitorTypingIndicator';
+            typingDiv.className = 'typing-indicator';
+            typingDiv.innerHTML = '<span></span><span></span><span></span>';
+            chatContainer.appendChild(typingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('visitorTypingIndicator');
+            if (indicator) indicator.remove();
+            isTyping = false;
+        }
+        
+        function sendVisitorMessage() {
+            const input = document.getElementById('visitorChatInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            addVisitorMessage(message, 'user');
+            input.value = '';
+            showTypingIndicator();
+            
+            setTimeout(() => {
+                const response = generateVisitorResponse(message);
+                removeTypingIndicator();
+                addVisitorMessage(response, 'ai');
+            }, 800);
+        }
+        
+        function askQuestion(question) {
+            document.getElementById('visitorChatInput').value = question;
+            sendVisitorMessage();
+        }
+        
+        function generateVisitorResponse(message) {
+            const msg = message.toLowerCase();
+            
+            // Office Hours
+            if (msg.includes('hour') || msg.includes('open') || msg.includes('close') || msg.includes('time')) {
+                return "🕐 **Office Hours:**\n• Monday-Friday: 8:00 AM - 5:00 PM\n• Saturday: 9:00 AM - 1:00 PM\n• Sunday: Closed\n\nWe're open during these hours. Is there a specific time you'd like to visit?";
+            }
+            
+            // Directions
+            if (msg.includes('direction') || msg.includes('where') || msg.includes('how to get')) {
+                if (msg.includes('bathroom') || msg.includes('restroom') || msg.includes('toilet')) {
+                    return "🚻 **Restrooms** are located to your left, just past the water fountain. There are also restrooms on every floor if you need them!";
+                }
+                if (msg.includes('elevator') || msg.includes('lift')) {
+                    return "🛗 **Elevators** are located to your right from the reception desk. They service all floors (1-4).";
+                }
+                if (msg.includes('stairs') || msg.includes('staircase')) {
+                    return "🪜 **Stairs** are located next to the elevators on the right side of the building.";
+                }
+                if (msg.includes('conference') || msg.includes('meeting room')) {
+                    return "📋 **Conference Rooms** are on the 2nd floor. Take the elevator to floor 2, turn left, and you'll see Rooms A, B, and C.";
+                }
+                return "📍 You're currently at the **Reception Area** on the 1st floor. Your host will come to meet you here. Is there a specific place you're looking for? (Restrooms, Conference Rooms, Elevators)";
+            }
+            
+            // Wait time
+            if (msg.includes('wait') || msg.includes('how long') || msg.includes('time')) {
+                return "⏱️ Your host has been notified and should be with you shortly. Typical wait time is 2-5 minutes. Would you like me to send them a reminder?";
+            }
+            
+            // WiFi
+            if (msg.includes('wifi') || msg.includes('internet') || msg.includes('network')) {
+                return "📶 **WiFi Access:**\n• Network: GuestWiFi\n• Password: welcome2024\n\nNo additional setup required - just connect and accept the terms!";
+            }
+            
+            // Coffee/Water
+            if (msg.includes('coffee') || msg.includes('water') || msg.includes('drink') || msg.includes('beverage')) {
+                return "☕ **Refreshments** are available at the coffee station to your right. We have water, coffee, and tea. Please help yourself while you wait!";
+            }
+            
+            // Parking
+            if (msg.includes('park') || msg.includes('car')) {
+                return "🅿️ **Parking Information:**\n• Visitor parking is available in the basement (B1)\n• Take the ramp down at the back of the building\n• Look for spaces marked 'Visitor'\n• Parking is free for up to 3 hours";
+            }
+            
+            // Building/Floor info
+            if (msg.includes('floor') || msg.includes('building')) {
+                return "🏢 **Building Layout:**\n• 1st Floor: Reception, HR, Finance\n• 2nd Floor: IT Department, Conference Rooms\n• 3rd Floor: Sales & Marketing\n• 4th Floor: R&D, Executive Offices\n\nWhat floor/department are you looking for?";
+            }
+            
+            // Host information
+            if (msg.includes('host') || msg.includes('who i am meeting')) {
+                const selectedHost = document.getElementById('visitorHost').value;
+                if (selectedHost) {
+                    return `👤 You're meeting with **${selectedHost}**. I've notified them of your arrival. They should be with you shortly!`;
+                }
+                return "👤 I see you haven't selected a host yet. Please select who you're here to see from the dropdown above, and I'll notify them!";
+            }
+            
+            // Thank you
+            if (msg.includes('thank')) {
+                return "You're very welcome! 😊 Enjoy your visit, and let me know if you need anything else!";
+            }
+            
+            // Help
+            if (msg.includes('help') || msg.includes('what can you do')) {
+                return "🤖 **I can help you with:**\n• Check-in process\n• Office hours\n• Directions (restrooms, conference rooms, etc.)\n• WiFi access\n• Parking information\n• Wait times\n• Refreshments\n\nJust ask me anything!";
+            }
+            
+            // Default
+            return "I'm here to help! 😊 You can ask me about:\n• Office hours\n• Directions\n• WiFi access\n• Parking\n• Wait times\n• Facilities\n\nWhat would you like to know?";
+        }
+        
+        // ==================== Print Badge ====================
+        function printBadge() {
+            const badgeNumber = document.getElementById('badgeNumber').innerHTML;
+            const visitorInfo = document.getElementById('visitorInfo').innerHTML;
+            const now = new Date();
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Visitor Badge</title>
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body {
+                            font-family: 'Segoe UI', Arial, sans-serif;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            min-height: 100vh;
+                            background: #f0f0f0;
+                        }
+                        .badge {
+                            background: white;
+                            border: 2px solid #4361ee;
+                            border-radius: 16px;
+                            padding: 30px;
+                            width: 350px;
+                            text-align: center;
+                            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+                        }
+                        .badge-header {
+                            background: linear-gradient(135deg, #4361ee, #3a56d4);
+                            color: white;
+                            padding: 15px;
+                            border-radius: 12px;
+                            margin-bottom: 20px;
+                        }
+                        .badge-header h2 { margin: 0; font-size: 24px; }
+                        .badge-number {
+                            font-size: 32px;
+                            font-weight: bold;
+                            color: #4361ee;
+                            letter-spacing: 2px;
+                            margin: 20px 0;
+                        }
+                        .visitor-details {
+                            text-align: left;
+                            margin: 20px 0;
+                            padding: 15px;
+                            background: #f8fafc;
+                            border-radius: 12px;
+                        }
+                        .visitor-details p {
+                            margin: 8px 0;
+                            font-size: 14px;
+                        }
+                        .footer {
+                            margin-top: 20px;
+                            font-size: 10px;
+                            color: #64748b;
+                            border-top: 1px solid #e2e8f0;
+                            padding-top: 15px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="badge">
+                        <div class="badge-header">
+                            <h2>VISITOR</h2>
+                        </div>
+                        <div class="badge-number">${badgeNumber}</div>
+                        <div class="visitor-details">
+                            ${visitorInfo.replace(/<br>/g, '<br>')}
+                            <p><strong>Date:</strong> ${now.toLocaleDateString()}</p>
+                            <p><strong>Time:</strong> ${now.toLocaleTimeString()}</p>
+                        </div>
+                        <div class="footer">
+                            Please wear this badge at all times<br>
+                            Return to reception when leaving
+                        </div>
+                    </div>
+                    <script>
+                        window.print();
+                        setTimeout(function() { window.close(); }, 500);
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+        
+        // ==================== Event Listeners ====================
+        document.getElementById('visitorSendBtn').addEventListener('click', sendVisitorMessage);
+        document.getElementById('visitorChatInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendVisitorMessage();
+        });
+        
+        document.getElementById('qrCodeBtn').addEventListener('click', () => {
+            alert('Scan this QR code with your phone to access the visitor check-in page easily!');
+        });
+        
+        // Listen for storage changes to update staff list
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'ai_receptionist_staff') {
+                loadStaffForVisitor();
+            }
+        });
+        
+        // ==================== Initialize ====================
+        loadStaffForVisitor();
+        generateQRCode();
+        
+        // Add auto-refresh for staff list every 10 seconds
+        setInterval(() => {
+            loadStaffForVisitor();
+        }, 10000);
+    </script>
+</body>
+</html>
