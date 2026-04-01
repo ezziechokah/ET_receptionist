@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Ezzietech AI Receptionist | Smart Office Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #eef2ff 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(67,97,238,0.03) 0%, rgba(67,97,238,0) 70%);
+            animation: rotate 30s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 16px 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo i {
+            font-size: 32px;
+            color: #4361ee;
+        }
+        
+        .logo span {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4361ee 0%, #f97316 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #1e293b;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #4361ee;
+        }
+        
+        .company-btn {
+            background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .company-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67,97,238,0.3);
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 120px 32px 80px;
+            text-align: center;
+        }
+        
+        .hero-badge {
+            display: inline-block;
+            background: rgba(67,97,238,0.1);
+            color: #4361ee;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 24px;
+        }
+        
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b 0%, #4361ee 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+        }
+        
+        .hero p {
+            font-size: 18px;
+            color: #64748b;
+            max-width: 700px;
+            margin: 0 auto 32px;
+            line-height: 1.6;
+        }
+        
+        /* Portal Cards */
+        .portals {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 32px;
+        }
+        
+        .portals-title {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        
+        .portals-title h2 {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 12px;
+        }
+        
+        .portals-title p {
+            color: #64748b;
+            font-size: 18px;
+        }
+        
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+        }
+        
+        .portal-card {
+            background: white;
+            border-radius: 32px;
+            padding: 40px 32px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        
+        .portal-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.02);
+        }
+        
+        .portal-card.admin:hover {
+            border: 2px solid #4361ee;
+        }
+        
+        .portal-card.staff:hover {
+            border: 2px solid #10b981;
+        }
+        
+        .portal-card.visitor:hover {
+            border: 2px solid #f97316;
+        }
+        
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+        
+        .admin .card-icon {
+            background: rgba(67,97,238,0.1);
+            color: #4361ee;
+        }
+        
+        .staff .card-icon {
+            background: rgba(16,185,129,0.1);
+            color: #10b981;
+        }
+        
+        .visitor .card-icon {
+            background: rgba(249,115,22,0.1);
+            color: #f97316;
+        }
+        
+        .portal-card h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        
+        .admin h3 { color: #4361ee; }
+        .staff h3 { color: #10b981; }
+        .visitor h3 { color: #f97316; }
+        
+        .portal-card p {
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        
+        .card-btn {
+            display: inline-block;
+            padding: 12px 32px;
+            border-radius: 40px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .admin .card-btn {
+            background: #4361ee;
+            color: white;
+        }
+        
+        .staff .card-btn {
+            background: #10b981;
+            color: white;
+        }
+        
+        .visitor .card-btn {
+            background: #f97316;
+            color: white;
+        }
+        
+        .card-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        /* Benefits Section */
+        .benefits {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 80px 32px;
+            margin: 40px 0;
+        }
+        
+        .benefits-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .benefits-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        
+        .benefits-header h2 {
+            font-size: 36px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 16px;
+        }
+        
+        .benefits-header p {
+            color: #94a3b8;
+            font-size: 18px;
+        }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+        }
+        
+        .benefit-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 32px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .benefit-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .benefit-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(67,97,238,0.2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
+            color: #4361ee;
+        }
+        
+        .benefit-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 12px;
+        }
+        
+        .benefit-card p {
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+        
+        /* Stats Section */
+        .stats {
+            padding: 60px 32px;
+            background: white;
+        }
+        
+        .stats-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 32px;
+            text-align: center;
+        }
+        
+        .stat-item h3 {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #4361ee 0%, #f97316 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        
+        .stat-item p {
+            color: #64748b;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+        
+        /* CTA Section */
+        .cta {
+            background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
+            padding: 60px 32px;
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        .cta h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 16px;
+        }
+        
+        .cta p {
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 32px;
+            font-size: 18px;
+        }
+        
+        .cta-btn {
+            display: inline-block;
+            background: white;
+            color: #4361ee;
+            padding: 14px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .cta-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        /* Footer */
+        .footer {
+            background: #0f172a;
+            color: white;
+            padding: 48px 32px 24px;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+        
+        .footer-section h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+        
+        .footer-section p {
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+        
+        .footer-section a {
+            color: #94a3b8;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 8px;
+            transition: color 0.3s;
+        }
+        
+        .footer-section a:hover {
+            color: #4361ee;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+        }
+        
+        .social-links a {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 32px;
+            margin-top: 32px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #64748b;
+            font-size: 14px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 20px;
+            }
+            
+            .nav-container {
+                flex-direction: column;
+            }
+            
+            .hero {
+                padding: 100px 20px 60px;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+            
+            .portals {
+                padding: 40px 20px;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .benefits {
+                padding: 60px 20px;
+            }
+            
+            .benefits-header h2 {
+                font-size: 28px;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .stat-item h3 {
+                font-size: 32px;
+            }
+            
+            .cta h2 {
+                font-size: 24px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .social-links {
+                justify-content: center;
+            }
+        }
+        
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .portal-card, .benefit-card, .stat-item {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        .portal-card:nth-child(1) { animation-delay: 0.1s; }
+        .portal-card:nth-child(2) { animation-delay: 0.2s; }
+        .portal-card:nth-child(3) { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+                <span>Ezzietech AI Receptionist</span>
+            </div>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#portals">Portals</a>
+                <a href="#benefits">Benefits</a>
+                <a href="https://ezzietech.com" target="_blank" class="company-btn">
+                    <i class="fas fa-globe"></i> Visit Ezzietech
+                </a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-badge">
+            <i class="fas fa-star"></i> Revolutionizing Office Management
+        </div>
+        <h1>AI-Powered Receptionist<br>for the Modern Workplace</h1>
+        <p>Ezzietech brings you the world's most intelligent receptionist system - seamlessly managing visitors, schedules, and communications with cutting-edge AI technology.</p>
+    </section>
+    
+    <!-- Portal Cards -->
+    <section id="portals" class="portals">
+        <div class="portals-title">
+            <h2>Choose Your Portal</h2>
+            <p>Select the interface that matches your role</p>
+        </div>
+        <div class="cards-grid">
+            <!-- Admin Portal -->
+            <div class="portal-card admin" onclick="goToAdmin()">
+                <div class="card-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Admin Dashboard</h3>
+                <p>Full system control for receptionists and office managers. Manage visitors, schedule meetings, send messages, and oversee all operations.</p>
+                <div class="card-btn">
+                    <i class="fas fa-lock"></i> Access Admin
+                </div>
+            </div>
+            
+            <!-- Staff Portal -->
+            <div class="portal-card staff" onclick="goToStaff()">
+                <div class="card-icon">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <h3>Staff Portal</h3>
+                <p>Personal dashboard for employees. View messages, check your schedule, see waiting visitors, and update your availability.</p>
+                <div class="card-btn">
+                    <i class="fas fa-user-check"></i> Access Staff
+                </div>
+            </div>
+            
+            <!-- Visitor Portal -->
+            <div class="portal-card visitor" onclick="goToVisitor()">
+                <div class="card-icon">
+                    <i class="fas fa-user-friends"></i>
+                </div>
+                <h3>Visitor Kiosk</h3>
+                <p>Self-service check-in for guests. Get your visitor badge, notify your host, and get answers from our AI assistant.</p>
+                <div class="card-btn">
+                    <i class="fas fa-sign-in-alt"></i> Check In
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Benefits Section - Ezzietech Impact -->
+    <section id="benefits" class="benefits">
+        <div class="benefits-container">
+            <div class="benefits-header">
+                <h2>Transforming Workplaces Across Africa</h2>
+                <p>Ezzietech is proud to introduce intelligent solutions that make a difference</p>
+            </div>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3>Save 200+ Hours Monthly</h3>
+                    <p>Automated visitor management reduces manual reception work by 85%, allowing staff to focus on what matters most.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>50% Faster Check-ins</h3>
+                    <p>Self-service kiosk and AI assistant reduce visitor wait times from minutes to seconds.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-shield-virus"></i>
+                    </div>
+                    <h3>Enhanced Security</h3>
+                    <p>Digital visitor tracking, badge printing, and host notification ensure complete accountability.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-microphone-alt"></i>
+                    </div>
+                    <h3>24/7 AI Assistant</h3>
+                    <p>Never miss a visitor inquiry - our AI works round the clock answering questions and managing requests.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h3>Eco-Friendly Solution</h3>
+                    <p>Digital visitor logs save thousands of sheets of paper annually - a greener approach to office management.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-chart-simple"></i>
+                    </div>
+                    <h3>Real-Time Analytics</h3>
+                    <p>Track visitor patterns, peak hours, and staff performance with comprehensive dashboards.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="stats-container">
+            <div class="stat-item">
+                <h3>10,000+</h3>
+                <p>Visitors Managed</p>
+            </div>
+            <div class="stat-item">
+                <h3>500+</h3>
+                <p>Businesses Using ET</p>
+            </div>
+            <div class="stat-item">
+                <h3>98%</h3>
+                <p>User Satisfaction</p>
+            </div>
+            <div class="stat-item">
+                <h3>24/7</h3>
+                <p>AI Availability</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta">
+        <h2>Ready to Transform Your Office?</h2>
+        <p>Join hundreds of forward-thinking organizations using Ezzietech AI Receptionist</p>
+        <a href="https://ezzietech.com" target="_blank" class="cta-btn">
+            <i class="fas fa-arrow-right"></i> Learn More About Ezzietech
+        </a>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Ezzietech AI Receptionist</h3>
+                <p>Revolutionizing office management with intelligent AI solutions. Making workplaces smarter, faster, and more efficient.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="#home">Home</a>
+                <a href="#portals">Access Portals</a>
+                <a href="#benefits">Benefits</a>
+                <a href="https://ezzietech.com" target="_blank">Ezzietech Website</a>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p><i class="fas fa-envelope"></i> info@ezzietech.com</p>
+                <p><i class="fas fa-phone"></i> +254 700 000 000</p>
+                <p><i class="fas fa-map-marker-alt"></i> Nairobi, Kenya</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Ezzietech. All rights reserved. | Empowering African businesses with intelligent technology</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Navigation Functions
+        function goToAdmin() {
+            // Check if admin.html exists
+            window.location.href = 'admin.html';
+        }
+        
+        function goToStaff() {
+            window.location.href = 'staff.html';
+        }
+        
+        function goToVisitor() {
+            window.location.href = 'visitor.html';
+        }
+        
+        // Add smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const target = this.getAttribute('href');
+                if (target === '#') return;
+                
+                const element = document.querySelector(target);
+                if (element) {
+                    e.preventDefault();
+                    element.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Add hover animation for cards
+        const cards = document.querySelectorAll('.portal-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-8px)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // Add typing animation to hero text (optional)
+        const heroText = document.querySelector('.hero h1');
+        if (heroText) {
+            const originalText = heroText.innerHTML;
+            heroText.style.opacity = '0';
+            setTimeout(() => {
+                heroText.style.transition = 'opacity 0.5s';
+                heroText.style.opacity = '1';
+            }, 100);
+        }
+        
+        // Add scroll reveal animation
+        const revealElements = document.querySelectorAll('.benefit-card, .stat-item');
+        const revealOnScroll = () => {
+            revealElements.forEach(el => {
+                const rect = el.getBoundingClientRect();
+                const windowHeight = window.innerHeight;
+                if (rect.top < windowHeight - 100) {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }
+            });
+        };
+        
+        // Set initial state
+        revealElements.forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s ease';
+        });
+        
+        window.addEventListener('scroll', revealOnScroll);
+        window.addEventListener('load', revealOnScroll);
+        
+        // Add floating animation to icons
+        const icons = document.querySelectorAll('.benefit-icon i, .card-icon i');
+        icons.forEach(icon => {
+            setInterval(() => {
+                icon.style.transform = 'translateY(-3px)';
+                setTimeout(() => {
+                    icon.style.transform = 'translateY(0)';
+                }, 300);
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
